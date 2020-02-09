@@ -3,7 +3,8 @@ import sin, cos from math
 import random from love.math
 tau = math.pi * 2
 
-hw, hh = graphics.getWidth! / 2, graphics.getHeight! / 2
+local hw, hh
+-- hw, hh = graphics.getWidth! / 2, graphics.getHeight! / 2
 
 class System
   new: (opts={}) =>
@@ -23,11 +24,16 @@ mkGalaxy = ->
     table.insert galaxy, System radius: i, offset: 0.2 + random! * (tau - 0.2)
   for i = 1, 2 * math.min hw, hh
     table.insert galaxy, System radius: i, offset: 0
-mkGalaxy!
+
+love.load = ->
+  love.window.setFullscreen true, "desktop"
+  hw, hh = graphics.getWidth! / 2, graphics.getHeight! / 2
+  mkGalaxy!
 
 time = os.time!
+speed = 1
 love.update = (dt) ->
-  time += dt
+  time += dt * speed
   for system in *galaxy
     system\update time
 
@@ -36,13 +42,13 @@ dist2 = (a, b) ->
   dy = a.y - b.y
   return dx * dx + dy * dy
 
-currentSystem = galaxy[100]
 love.draw = ->
   graphics.translate hw, hh
   graphics.scale 0.5, 0.5
   for system in *galaxy
     system\draw!
 
+  -- currentSystem = galaxy[100]
   -- dynamic formula (more range further out)
   -- d = math.max 10, 0.25^2 * dist2 currentSystem, {x:0, y:0}
   -- for system in *galaxy
@@ -72,7 +78,8 @@ love.keypressed = (key) ->
   if key == "escape"
     love.event.quit!
   elseif key == "r"
-    -- currentSystem = galaxy[random(#galaxy)]
     mkGalaxy!
-
--- TODO figure out how to make borderless 1080p
+  elseif key == "="
+    speed *= 2
+  elseif key == "-"
+    speed /= 2
